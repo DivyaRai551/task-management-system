@@ -1,0 +1,53 @@
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: task-manager-mongo
+    restart: always
+    volumes:
+      # Persist MongoDB data outside the container
+      - mongo_data:/data/db
+    ports:
+      # Map the MongoDB port to the host (needed for development tools)
+      - "27017:27017"
+    environment:
+      # Set the default database name for MongoDB (optional, can be done via URI)
+      MONGO_INITDB_DATABASE: task_management_db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: task-manager-backend
+    restart: on-failure
+    environment:
+      # --- IMPORTANT: MongoDB URI for the container network ---
+      # The host name must be the service name 'mongodb'
+      MONGO_URI: mongodb://mongodb:27017/task_management_db
+      # You can add other environment vars like SECRET_KEY here:
+      JWT_SECRET_KEY: jwt-super-secret-docker
+      SECRET_KEY: default_secret_key
+    ports:
+      # Map container port 5000 to host port 5000
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    # Command is specified in Dockerfile, but you can override here if needed:
+    command: gunicorn --bind 0.0.0.0:5000 --timeout 90 app:create_app()
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: task-manager-frontend
+    restart: always
+    ports:
+      # Map Nginx port 80 to host port 3000 (standard React dev port)
+      - "3000:80"
+    depends_on:
+      - backend
+    # You might need to set an environment variable here if your frontend
+    # needs to explicitly know the backend URL, though Axios should use relative paths if run locally.
+
+volumes:
+  mongo_data:
