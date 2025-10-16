@@ -1,70 +1,110 @@
-# Getting Started with Create React App
+# Task Management System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a modular, full-stack Task Management System featuring authenticated CRUD operations, built for portability using Docker Compose. The system consists of a **Flask API backend** and a **React SPA frontend** with **MongoDB** for persistence.
 
-## Available Scripts
+## Core Features
 
-In the project directory, you can run:
+- **Authentication & Access Control:** JWT-based login/registration with Role-Based Access Control (RBAC).
+- **Task Management:** Complete CRUD functionality with filtering, sorting, and pagination (FSP).
+- **File Handling:** Secure upload and retrieval of PDF documents.
+- **Data Integrity:** Cascading deletion of associated tasks when a user account is removed.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 💻 Project Architecture and Stack
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Backend Stack
 
-### `npm test`
+| Component          | Technology                     | Role                                        |
+| :----------------- | :----------------------------- | :------------------------------------------ |
+| **Framework**      | Python 3.12, **Flask**         | RESTful API, Routing, and Business Logic.   |
+| **Authentication** | Flask-JWT-Extended, **Bcrypt** | JWT issuance and password hashing.          |
+| **Data Access**    | **Flask-PyMongo**              | MongoDB client and integration.             |
+| **Server**         | **Gunicorn**                   | Production-ready WSGI server within Docker. |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Frontend Stack
 
-### `npm run build`
+| Component      | Technology            | Role                                                          |
+| :------------- | :-------------------- | :------------------------------------------------------------ |
+| **Framework**  | **React.js**          | Single-Page Application (SPA) development.                    |
+| **State**      | **Redux Toolkit**     | Centralized state management and asynchronous logic (Thunks). |
+| **UI/Styling** | **Material-UI (MUI)** | Component library for consistent, modern interface design.    |
+| **Networking** | **Axios**             | HTTP client for communicating with the Flask API.             |
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🚀 Quick Start (Docker Compose)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The entire stack can be launched using Docker Compose from the root directory.
 
-### `npm run eject`
+### Prerequisites
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- Git
+- Docker Desktop (must be running)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 1. Setup and Cloning
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+git clone [repository-url]
+cd task-management-system
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 2\. Configure Environment
 
-## Learn More
+Create a file named **`.env`** in the root directory to define necessary secrets and MongoDB credentials. **These credentials enable authenticated access to the MongoDB service.**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+# .env file content
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+# --- Flask/JWT Configuration ---
+SECRET_KEY=your_very_secret_key_change_me
+JWT_SECRET_KEY=your_jwt_signing_key_change_me
 
-### Code Splitting
+# --- MongoDB Authentication ---
+MONGO_USER=taskuser
+MONGO_PASSWORD=strongpassword
+MONGO_DB=task_management_db
+DB_HOST=mongodb
+DB_PORT=27017
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### 3\. Build and Run Services
 
-### Analyzing the Bundle Size
+Execute the following command to build the images and launch the three services (`mongodb`, `backend`, `frontend`):
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+docker compose up --build -d
+```
 
-### Making a Progressive Web App
+| Argument  | Purpose                                        |
+| :-------- | :--------------------------------------------- |
+| `--build` | Forces a rebuild of the Docker images.         |
+| `-d`      | Runs containers in detached (background) mode. |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## 🌐 Application Access and API
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+The services are exposed on the host machine via the following addresses:
 
-### Deployment
+| Service         | Address                 | Notes                               |
+| :-------------- | :---------------------- | :---------------------------------- |
+| **Frontend UI** | `http://localhost:3000` | Access the application dashboard.   |
+| **Backend API** | `http://localhost:5000` | Base URL for all RESTful API calls. |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### API Documentation and Postman
 
-### `npm run build` fails to minify
+The complete set of API endpoints, including setup and test data, is available via the **Postman Collection** located in the repository source. This collection defines all endpoints for Authentication, Task CRUD, and Admin User Management.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+## 🐳 Docker Management Commands
+
+Use these commands from the project root directory for container control:
+
+| Command                         | Description                                                                               |
+| :------------------------------ | :---------------------------------------------------------------------------------------- |
+| `docker compose ps`             | View the status of all containers.                                                        |
+| `docker compose logs [service]` | View real-time logs for a specific service (e.g., `backend`).                             |
+| `docker compose stop`           | Gracefully stop running containers.                                                       |
+| `docker compose down`           | Stops and removes containers, networks, and volumes (use `-v` to remove persistent data). |
